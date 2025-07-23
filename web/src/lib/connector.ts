@@ -102,7 +102,8 @@ export async function deleteConnector(
 export async function runConnector(
   connectorId: number,
   credentialIds: number[],
-  fromBeginning: boolean = false
+  fromBeginning: boolean = false,
+  highPriority: boolean = false
 ): Promise<string | null> {
   const response = await fetch("/api/manage/admin/connector/run-once", {
     method: "POST",
@@ -111,6 +112,7 @@ export async function runConnector(
       connector_id: connectorId,
       credentialIds,
       from_beginning: fromBeginning,
+      high_priority: highPriority,
     }),
   });
   if (!response.ok) {

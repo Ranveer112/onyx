@@ -20,12 +20,14 @@ export async function triggerIndexing(
   connectorId: number,
   credentialId: number,
   ccPairId: number,
-  setPopup: (popupSpec: PopupSpec | null) => void
+  setPopup: (popupSpec: PopupSpec | null) => void,
+  highPriority: boolean = false
 ): Promise<{ success: boolean; message: string }> {
   const errorMsg = await runConnector(
     connectorId,
     [credentialId],
-    fromBeginning
+    fromBeginning,
+    highPriority
   );
 
   mutate(buildCCPairInfoUrl(ccPairId));

@@ -430,6 +430,7 @@ class RunConnectorRequest(BaseModel):
     connector_id: int
     credential_ids: list[int] | None = None
     from_beginning: bool = False
+    high_priority: bool = False
 
 
 class CCPropertyUpdateRequest(BaseModel):

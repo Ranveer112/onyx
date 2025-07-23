@@ -1108,6 +1108,7 @@ def connector_run_once(
             run_info.from_beginning,
             tenant_id,
             db_session,
+            is_user_file=run_info.high_priority,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

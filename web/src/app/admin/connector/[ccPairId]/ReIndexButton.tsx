@@ -98,6 +98,45 @@ export function ReIndexButton({
 }) {
   const { popup, setPopup } = usePopup();
   const [reIndexPopupVisible, setReIndexPopupVisible] = useState(false);
+  const [isPrioritizing, setIsPrioritizing] = useState(false);
+
+  const handlePrioritize = async () => {
+    setIsPrioritizing(true);
+    try {
+      const result = await triggerIndexing(
+        false, // fromBeginning
+        connectorId,
+        credentialId,
+        ccPairId,
+        setPopup,
+        true // highPriority
+      );
+      if (result.success) {
+        setPopup({
+          message: "Indexing job prioritized successfully!",
+          type: "success",
+        });
+      } else {
+        setPopup({
+          message: result.message,
+          type: "error",
+        });
+      }
+    } catch (error) {
+      setPopup({
+        message: "Failed to prioritize indexing job",
+        type: "error",
+      });
+    } finally {
+      setIsPrioritizing(false);
+    }
+  };
+
+  const isButtonDisabled = 
+    isDisabled ||
+    ccPairStatus == ConnectorCredentialPairStatus.DELETING ||
+    ccPairStatus == ConnectorCredentialPairStatus.PAUSED ||
+    ccPairStatus == ConnectorCredentialPairStatus.INVALID;
 
   return (
     <>
@@ -111,22 +150,28 @@ export function ReIndexButton({
         />
       )}
       {popup}
-      <Button
-        variant="success-reverse"
-        className="ml-auto min-w-[100px]"
-        onClick={() => {
-          setReIndexPopupVisible(true);
-        }}
-        disabled={
-          isDisabled ||
-          ccPairStatus == ConnectorCredentialPairStatus.DELETING ||
-          ccPairStatus == ConnectorCredentialPairStatus.PAUSED ||
-          ccPairStatus == ConnectorCredentialPairStatus.INVALID
-        }
-        tooltip={getCCPairStatusMessage(isDisabled, isIndexing, ccPairStatus)}
-      >
-        Re-Index
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          className="min-w-[100px]"
+          onClick={handlePrioritize}
+          disabled={isButtonDisabled || isPrioritizing}
+          tooltip={isButtonDisabled ? getCCPairStatusMessage(isDisabled, isIndexing, ccPairStatus) : "Trigger high-priority indexing job"}
+        >
+          {isPrioritizing ? "Prioritizing..." : "Prioritize"}
+        </Button>
+        <Button
+          variant="success-reverse"
+          className="min-w-[100px]"
+          onClick={() => {
+            setReIndexPopupVisible(true);
+          }}
+          disabled={isButtonDisabled}
+          tooltip={getCCPairStatusMessage(isDisabled, isIndexing, ccPairStatus)}
+        >
+          Re-Index
+        </Button>
+      </div>
     </>
   );
 }
